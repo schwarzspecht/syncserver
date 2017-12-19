@@ -1,0 +1,14 @@
+version: '2'
+services:
+  syncserver:
+    image: arm32v7_syncserver:latest
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - SYNCSERVER_PUBLIC_URL=http://192.168.178.135:5000/
+      - SYNCSERVER_SQLURI=sqlite:////tmp/syncserver.db
+      - SYNCSERVER_BATCH_UPLOAD_ENABLED=true
+      - SYNCSERVER_FORCE_WSGI_ENVIRON=false
+    command: /usr/local/bin/gunicorn --bind 0.0.0.0:5000 syncserver.wsgi_app

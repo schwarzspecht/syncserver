@@ -1,4 +1,4 @@
-FROM python:2.7-slim
+FROM arm32v7/python:2.7-slim
 
 RUN groupadd --gid 1001 app && \
     useradd --uid 1001 --gid 1001 --shell /usr/sbin/nologin app
@@ -8,9 +8,10 @@ ENV LANG C.UTF-8
 WORKDIR /app
 
 # S3 bucket in Cloud Services prod IAM
-ADD https://s3.amazonaws.com/dumb-init-dist/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
-RUN chmod +x /usr/local/bin/dumb-init
-ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+ADD  http://ftp.us.debian.org/debian/pool/main/d/dumb-init/dumb-init_1.2.0-1_armhf.deb /tmp/dumb-init_1.2.0-1_armhf.deb 
+RUN dpkg -x /tmp/dumb-init_1.2.0-1_armhf.deb /
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 # install syncserver dependencies
 COPY ./requirements.txt /app/requirements.txt
@@ -25,7 +26,7 @@ RUN apt-get -q update \
 
 COPY ./syncserver /app/syncserver
 COPY ./setup.py /app
-RUN python ./setup.py develop
+#RUN python ./setup.py develop
 
 # run as non priviledged user
 USER app
